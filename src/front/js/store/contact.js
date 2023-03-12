@@ -28,5 +28,13 @@ export function contactActions(getStore, getActions, setStore) {
       })
       setStore ({...store, listaContactos:arrTemp})
     },
+    editContact: (indice,nombre,correo,telefono) => {
+      let store = getStore();
+      let arrTemp = store.listaContactos.slice()
+      arrTemp[indice]["full_name"] = nombre
+      arrTemp[indice]["email"] = correo
+      arrTemp[indice]["phone"] = telefono
+      setStore({...store, listaContactos: arrTemp})
+    }
   };
 }
