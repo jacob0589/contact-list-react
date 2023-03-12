@@ -18,6 +18,7 @@ const Contactos = () => {
                     return (
                         <li key={index}>
                             {item.full_name} - {item.email} - {item.phone}
+                            <button className="btn btn-danger" type="button" onClick={()=>{actions.deleteContact(index)}}>Eliminar Contacto</button>
                         </li>
                     )
                 })}
