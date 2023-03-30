@@ -4,39 +4,95 @@ import { Link } from "react-router-dom";
 
 const Contactos = () => {
     const { store, actions } = useContext(Context)
-const [nombre, setNombre] = useState("")
-const [correo, setCorreo] = useState("")
-const [telefono, setTelefono] = useState("")
-    useEffect(() => { }, [store.listaContactos, nombre, correo, telefono])
+    const [nombre, setNombre] = useState("")
+    const [email, setEmail] = useState("")
+    const [phone, setPhone] = useState("")
+    const [address, setAddress] = useState("")
+    const [lista, setLista] = useState(store.listaContactos)
+    const [refresh, setRefresh] = useState(false)
+    const [estadoTemporal, setEstadotemporal] = useState({})
 
-    return (<div>
-        Contactos
-        <br />
-        <Link to="/add-contact">Agregar un contacto</Link>
-        <br/>
-        <input type = "text" placeholder="nombreNuevo" onChange={(e)=> setNombre(e.target.value)}/>
-        <input type = "text" placeholder="correoNuevo" onChange={(e)=> setCorreo(e.target.value)}/>
-        <input type = "text" placeholder="telefonoNuevo" onChange={(e)=> setTelefono(e.target.value)}/>
-        <br />
-        <ul>
-            {store.listaContactos && store.listaContactos.length > 0 ? <>
-                {store.listaContactos.map((item, index) => {
-                    return (
-                        <li key={index}>
-                            {item.full_name} - {item.email} - {item.phone}
-                            <button className="btn btn-danger" type="button" onClick={()=>{actions.deleteContact(index)}}>Eliminar Contacto</button>
-                            <button className="btn btn-warning" type="button" onClick={()=>{
-                                 if (nombre=== "", correo=== "", telefono==="")
-                                 {alert("Agregue Datos de contacto");
-                                 return
-                            }
-                                actions.editContact(index,nombre,correo,telefono)}}>Editar Contacto</button>
-                        </li>
-                    )
-                })}
-            </> : <>No hay contactos</>}
-        </ul>
-    </div>)
+    useEffect(() => {
+        let funcionCarga = async () => {
+
+            actions.funcionCarga()
+        }
+        funcionCarga()
+
+    }, [refresh])
+
+    useEffect(() => { }, [lista, nombre])
+
+    return (<>
+        <div className="container-fluid ms-2">
+            <div className="row p-5">
+                <div className="col-md-12 d-flex justify-content-end">
+                    <button className="btn btn-success">
+                        <Link to="/add-contact" style={{ color: 'white' }}>Add a new contact</Link>
+                    </button>
+                </div>
+            </div>
+            <div className="row d-flex justify-content-center w-100">
+                <div className="col-12 col-md-8 col-lg-6 w-100 border">
+                    <ul className="list-group">
+                        {store.listaContactos && store.listaContactos.length > 0 ? (
+                            store.listaContactos.map((item, index) => {
+                                return (
+                                    <div key={index} className="row border-bottom py-3">
+                                        <div className="col-2">
+                                            <img className="img-thumbnail" src="https://cdn.icon-icons.com/icons2/2657/PNG/256/contactos_icon_161077.png"></img>
+                                        </div>
+                                        <div className="col-8">
+                                            <h3 className="mb-3">{item.full_name}</h3>
+                                            <p className="text-secondary"><i className="fa-solid fa-location-arrow"></i><span className="ms-3">{item.address}</span></p>
+                                            <p className="text-secondary"><i className="fa-solid fa-at"></i><span className="ms-3">{item.email}</span></p>
+                                            <p className="text-secondary"><i className="fa fa-phone-flip"></i><span className="ms-3">{item.phone}</span></p>
+                                        </div>
+                                        <div className="col-2 d-flex align-items-center justify-content-end">
+                                            <button
+                                                className="btn btn-lg text-success m-2"
+                                                button="button"
+                                                onClick={() => {
+                                                    console.log(item.full_name);
+                                                    const nombrePrompt = prompt("Enter new name:", item["full_name"]);
+                                                    const emailPrompt = prompt("Enter new email:", item.email);
+                                                    const phonePrompt = prompt("Enter new phone number:", item.phone);
+                                                    const addressPrompt = prompt("Enter new address:", item.address);
+                                                    let obj = {
+                                                        "full_name": nombrePrompt,
+                                                        "email": emailPrompt,
+                                                        "agenda_slug": "agenda_de_alonso",
+                                                        "address": addressPrompt,
+                                                        "phone": phonePrompt
+                                                    }
+                                                    actions.putFetch(item.id, obj);
+                                                }}
+                                            >
+                                                <i className="fa fa-pencil"></i>
+                                            </button>
+                                            <button
+                                                className="btn btn-lg m-2 text-danger"
+                                                type="button"
+                                                onClick={async () => {
+                                                    actions.deleteContact(item.id);
+
+                                                }}
+                                            >
+                                                <i className="fa-solid fa-trash"></i>
+                                            </button>
+
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className="text-center py-3">This contact list is empty</div>
+                        )}
+                    </ul>
+                </div>
+            </div>
+        </div >
+    </>)
 }
 
 export default Contactos;
